@@ -35,8 +35,8 @@ To destroy the provisioned EKS Infrastructure, execute the command below
 This command, removes the whole infrastructure from the AWS account and cleans up the project from the configuration
 
 `````
-kubectl delete deployment.yml
-kubectl delete service.yml
+kubectl delete -f deployment.yml
+kubectl delete -f service.yml
 terraform destroy -auto-approve
 `````
 or you can run the `destroy.sh` bash script by passing the command below
