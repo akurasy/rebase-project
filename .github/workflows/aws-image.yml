@@ -27,14 +27,14 @@ jobs:
           AMI_NAME="my-ami-$(date +%Y-%m-%d-%H-%M-%S)"
           # Create an AMI from the specified EC2 instance
           AMI_ID=$(aws ec2 create-image --instance-id $INSTANCE_ID --name $AMI_NAME --no-reboot --query 'ImageId' --output text)
+          echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV
           echo "AMI creation initiated with ID $AMI_ID"
 
       - name: Wait for the AMI to be available
         id: wait_for_ami
         run: |
-          AMI_NAME="my-ami-$(date +%Y-%m-%d-%H-%M-%S)"
-          echo "Checking for AMI with name $AMI_NAME"
-          AMI_ID=$AMI_ID
+          AMI_ID=${{ env.AMI_ID }}
+          echo "Checking for AMI with ID $AMI_ID"
           # Loop until the AMI is available
           while true; do
             AMI_STATE=$(aws ec2 describe-images --image-ids $AMI_ID --query 'Images[0].State' --output text)
@@ -46,3 +46,7 @@ jobs:
               sleep 10  # Wait for 10 seconds before checking again
             fi
           done
+
+      - name: Output AMI ID
+        run: |
+          echo "The AMI ID is: ${{ env.AMI_ID }}"
