@@ -34,6 +34,15 @@ jobs:
         run: |
           AMI_NAME="my-ami-$(date +%Y-%m-%d-%H-%M-%S)"
           echo "Checking for AMI with name $AMI_NAME"
-          # The ID of the created AMI is stored in $AMI_ID from the previous step
-          echo "AMI_ID: $AMI_ID"
-          # You might want to implement a loop here to wait until the AMI is available, using `aws ec2 describe-images` or similar.
+          AMI_ID=$AMI_ID
+          # Loop until the AMI is available
+          while true; do
+            AMI_STATE=$(aws ec2 describe-images --image-ids $AMI_ID --query 'Images[0].State' --output text)
+            if [ "$AMI_STATE" = "available" ]; then
+              echo "AMI $AMI_ID is available"
+              break
+            else
+              echo "AMI $AMI_ID is not yet available, waiting..."
+              sleep 10  # Wait for 10 seconds before checking again
+            fi
+          done
