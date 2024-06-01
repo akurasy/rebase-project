@@ -1,4 +1,4 @@
-name: Create AMI and Deploy EC2 Instance
+name: Create AMI and Deploy EC2 Instance.
 
 on:
   push:
@@ -33,10 +33,6 @@ jobs:
         run: |
           AMI_NAME="my-ami-$(date +%Y-%m-%d-%H-%M-%S)"
           echo "Checking for AMI with name $AMI_NAME"
-          AMI_ID=$(aws ec2 describe-images --owners self --filters "Name=name,Values=$AMI_NAME" --query "Images[*].ImageId" --output text)
-          echo "Initial AMI_ID: $AMI_ID"
-          echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV
-          echo "AMI is now available with ID $AMI_ID"
-
-      - name: Print AMI ID
-        run: echo "Created AMI with ID ${{ env.AMI_ID }}"
+          AMI_ID=$ImageId
+          echo "Initial AMI_ID: $ImageId"
+      
