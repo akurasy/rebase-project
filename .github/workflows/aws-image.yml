@@ -1,4 +1,4 @@
-name: Create AMI
+name: Create AMI and Deploy EC2 Instance
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main  # Adjust the branch as necessary
 
 jobs:
-  create-ami:
+  create-ami-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,10 +27,16 @@ jobs:
           AMI_NAME="my-ami-$(date +%Y-%m-%d-%H-%M-%S)"
           aws ec2 create-image --instance-id $INSTANCE_ID --name $AMI_NAME --no-reboot
 
-      - name: Get AMI ID
-        id: ami_id
+      - name: Wait for the AMI to be available
+        id: wait_for_ami
         run: |
-          echo "AMI_ID=$(aws ec2 describe-images --owners self --filters "Name=name,Values=$AMI_NAME" --query "Images[0].ImageId" --output text)" >> $GITHUB_ENV
+          AMI_ID=$(aws ec2 describe-images --owners self --filters "Name=name,Values=$AMI_NAME" --query "Images[0].ImageId" --output text)
+          while [ "$AMI_ID" = "None" ]; do
+            echo "Waiting for AMI to be available..."
+            sleep 10
+            AMI_ID=$(aws ec2 describe-images --owners self --filters "Name=name,Values=$AMI_NAME" --query "Images[0].ImageId" --output text)
+          done
+          echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV
 
       - name: Print AMI ID
         run: echo "Created AMI with ID ${{ env.AMI_ID }}"
