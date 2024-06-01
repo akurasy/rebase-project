@@ -1,4 +1,4 @@
-name: Create AMI and Deploy EC2 Instance.
+name: Create AMI and Deploy EC2 Instance
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main  # Adjust the branch as necessary
 
 jobs:
-  create-ami-and-deploy:
+  create-ami:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,14 +25,15 @@ jobs:
         run: |
           INSTANCE_ID="i-02dc95e2d59cf05b4"  # Replace with your instance ID
           AMI_NAME="my-ami-$(date +%Y-%m-%d-%H-%M-%S)"
-          aws ec2 create-image --instance-id $INSTANCE_ID --name $AMI_NAME --no-reboot
-          echo "AMI creation initiated with name $AMI_NAME"
+          # Create an AMI from the specified EC2 instance
+          AMI_ID=$(aws ec2 create-image --instance-id $INSTANCE_ID --name $AMI_NAME --no-reboot --query 'ImageId' --output text)
+          echo "AMI creation initiated with ID $AMI_ID"
 
       - name: Wait for the AMI to be available
         id: wait_for_ami
         run: |
           AMI_NAME="my-ami-$(date +%Y-%m-%d-%H-%M-%S)"
           echo "Checking for AMI with name $AMI_NAME"
-          AMI_ID=$ImageId
-          echo "Initial AMI_ID: $ImageId"
-      
+          # The ID of the created AMI is stored in $AMI_ID from the previous step
+          echo "AMI_ID: $AMI_ID"
+          # You might want to implement a loop here to wait until the AMI is available, using `aws ec2 describe-images` or similar.
