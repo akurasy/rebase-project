@@ -23,7 +23,7 @@ jobs:
       - name: Create AMI from EC2 instance
         id: create_ami
         run: |
-          INSTANCE_ID="i-1234567890abcdef0"  # Replace with your instance ID
+          INSTANCE_ID="i-02dc95e2d59cf05b4"  # Replace with your instance ID
           AMI_NAME="my-ami-$(date +%Y-%m-%d-%H-%M-%S)"
           aws ec2 create-image --instance-id $INSTANCE_ID --name $AMI_NAME --no-reboot
           echo "AMI creation initiated with name $AMI_NAME"
